@@ -223,9 +223,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 300
-  jumpForce: 150
+  jumpForce: 15
   characterHeight: 1
-  coyoteTime: 1
+  coyoteTime: 0.2
   groundCheck:
     serializedVersion: 2
     m_Bits: 64
