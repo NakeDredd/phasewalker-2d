@@ -8,12 +8,14 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private int speed;
     [SerializeField] private int jumpForce;
     [SerializeField] private float characterHeight;
+    [SerializeField] private float coyoteTime;
 
     [SerializeField] private LayerMask groundCheck;
 
     private Rigidbody2D rb;
 
     private float moveInput;
+    private float coyoteTimeCounter;
 
 
     private void Start()
@@ -24,10 +26,25 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         Move();
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, characterHeight, groundCheck.value);
-        if (Input.GetKey(KeyCode.Space) && hit.collider != null)
+
+        if (IsGrounded())
         {
-            Jump();
+            coyoteTimeCounter = coyoteTime;
+        }
+        else
+        {
+            coyoteTimeCounter -= Time.fixedDeltaTime;
+        }
+
+        if (Input.GetKey(KeyCode.Space) && coyoteTimeCounter > 0f)
+        {
+            Jump(true);
+
+        }
+        if (Input.GetKey(KeyCode.Space) && IsGrounded())
+        {
+            Jump(false);
+            coyoteTimeCounter = 0f;
         }
     }
 
@@ -38,9 +55,20 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = moveVector;
     }
 
-    private void Jump()
+    private void Jump(bool isCoyote)
     {
-        Vector2 jumpVector2 = Vector2.up * jumpForce;
-        rb.AddForce(jumpVector2, ForceMode2D.Impulse);
+        if (isCoyote)
+        {
+            Vector2 jumpVector2 = new Vector2(rb.velocity.x, jumpForce);
+            rb.velocity = jumpVector2;
+        }else
+        {
+            Vector2 jumpVector2 = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+        }
+    }
+    
+    private bool IsGrounded()
+    {
+        return Physics2D.Raycast(transform.position, Vector2.down, characterHeight, groundCheck.value).collider != null; 
     }
 }
