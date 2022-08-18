@@ -2,9 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [SerializeField] private PlayerInput playerInput;
+
     [SerializeField] private int speed;
     [SerializeField] private int jumpForce;
     [SerializeField] private float characterHeight;
@@ -14,18 +18,27 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
 
-    private float moveInput;
+    private InputAction moving;
+
     private float coyoteTimeCounter;
 
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        moving = playerInput.actions["Movement"];
+
+        playerInput.actions["Jump"].performed += Jump;
+    }
+    private void OnDisable()
+    {
+        playerInput.actions["Jump"].performed -= Jump;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        Move();
+        Move(moving.ReadValue<Vector2>());
 
         if (IsGrounded())
         {
@@ -33,37 +46,31 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            coyoteTimeCounter -= Time.fixedDeltaTime;
-        }
-
-        if (Input.GetKey(KeyCode.Space) && coyoteTimeCounter > 0f)
-        {
-            Jump(true);
-
-        }
-        if (Input.GetKey(KeyCode.Space) && IsGrounded())
-        {
-            Jump(false);
-            coyoteTimeCounter = 0f;
+            coyoteTimeCounter -= Time.deltaTime;
         }
     }
 
-    private void Move()
+    private void Move(Vector2 value)
     {
-        moveInput = Input.GetAxis("Horizontal") * speed;
-        Vector2 moveVector = new Vector2(moveInput * Time.fixedDeltaTime, rb.velocity.y);
+        Vector2 moveVector = new Vector2(0, 0);
+
+        moveVector.x = value.x * speed * Time.fixedDeltaTime;
+
+        moveVector.y = rb.velocity.y;
+
         rb.velocity = moveVector;
     }
 
-    private void Jump(bool isCoyote)
+    private void Jump(CallbackContext context)
     {
-        if (isCoyote)
+        if (coyoteTimeCounter > 0f)
         {
             Vector2 jumpVector2 = new Vector2(rb.velocity.x, jumpForce);
             rb.velocity = jumpVector2;
-        }else
+        }
+        else if (IsGrounded())
         {
-            Vector2 jumpVector2 = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+            coyoteTimeCounter = 0f;
         }
     }
     
