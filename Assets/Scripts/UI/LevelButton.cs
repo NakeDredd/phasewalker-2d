@@ -30,6 +30,5 @@ public class LevelButton : MonoBehaviour
     private void SendLevelToLoad()
     {
         OnLevelButtonClick.Invoke(levelIndex);
-
     }
 }

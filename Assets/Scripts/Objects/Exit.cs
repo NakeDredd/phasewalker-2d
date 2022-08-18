@@ -7,14 +7,9 @@ public class Exit : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.TryGetComponent<PlayerMovement>(out _))
+        if (collision.TryGetComponent(out PlayerMovement playerMovement))
         {
-            TryToLoadNextLevel();
+            EndGameController.Instance.EndGame(true);
         }
-    }
-
-    private void TryToLoadNextLevel()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 }
