@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 public enum Timeline
 {
@@ -12,28 +14,21 @@ public enum Timeline
 public class PhaseWalker : MonoBehaviour
 {
     [SerializeField] private Timeline currentTimeline;
-    [SerializeField] private float cooldown;
-
-    private float cooldownTimer;
+    [SerializeField] private PlayerInput playerInput;
 
     public delegate void PhaseWalkerEvents(Timeline newTimeline);
     public static PhaseWalkerEvents OnChangeTimeline;
 
-    private void Update()
+    private void Start()
     {
-        if (cooldownTimer <= cooldown)
-        {
-            cooldownTimer -= Time.deltaTime;
-        }
-
-        if (Input.GetMouseButton(0) && cooldownTimer <= 0)
-        {
-            ChangeTimeline();
-            cooldownTimer = cooldown;
-        }
+        playerInput.actions["SwipeTimeline"].performed += ChangeTimeline;
     }
-    
-    private void ChangeTimeline()
+    private void OnDisable()
+    {
+        playerInput.actions["SwipeTimeline"].performed -= ChangeTimeline;
+    }
+
+    private void ChangeTimeline(CallbackContext context)
     {
         if (currentTimeline == Timeline.Present)
         {

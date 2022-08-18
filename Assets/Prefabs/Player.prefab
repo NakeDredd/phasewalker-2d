@@ -159,6 +159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentTimeline: 0
+  playerInput: {fileID: 478374241228166470}
   cooldown: 0
 --- !u!114 &478374241228166470
 MonoBehaviour:

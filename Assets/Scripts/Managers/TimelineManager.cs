@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LevelManager : MonoBehaviour
+public class TimelineManager : MonoBehaviour
 {
     [SerializeField] private GameObject past;
     [SerializeField] private GameObject present;
@@ -15,7 +15,6 @@ public class LevelManager : MonoBehaviour
 
     private void Awake()
     {
-        Exit.OnLevelComplete += TryToLoadNextLevel;
         PhaseWalker.OnChangeTimeline += ChangeTimeline;
 
         currentTimelineObject = past;
@@ -24,13 +23,7 @@ public class LevelManager : MonoBehaviour
 
     private void OnDisable()
     {
-        Exit.OnLevelComplete -= TryToLoadNextLevel;
         PhaseWalker.OnChangeTimeline -= ChangeTimeline;
-    }
-
-    private void TryToLoadNextLevel()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
     private void ChangeTimeline(Timeline newTimeline)
